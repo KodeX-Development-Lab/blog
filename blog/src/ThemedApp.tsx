@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
     CssBaseline,
     Snackbar,
@@ -6,7 +6,7 @@ import {
     createTheme,
 } from "@mui/material";
 import { deepPurple, grey } from "@mui/material/colors";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import { QueryClientProvider, QueryClient } from "react-query";
 
 import Template from "./Template";
@@ -16,6 +16,9 @@ import Register from "./pages/Register";
 import Likes from "./pages/Likes";
 import Profile from "./pages/Profile";
 import Comments from "./pages/Comments";
+
+import { fetchVerify } from "./libs/fetcher";
+import PostDetail from "./pages/PostDetail";
 
 // import App from "./App";
 // import AppDrawer from "./components/AppDrawer";
@@ -46,8 +49,8 @@ const router = createBrowserRouter([
                 element: <Register />,
             },
             {
-                path: "/comments/:id",
-                element: <Comments />,
+                path: "/posts/:id",
+                element: <PostDetail />,
             },
             {
                 path: "/profile/:id",
@@ -65,10 +68,19 @@ export const queryClient = new QueryClient();
 
 export default function ThemedApp() {
     const [showDrawer, setShowDrawer] = useState(false);
+    const [showSearchForm, setSearchShowForm] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [globalMsg, setGlobalMsg] = useState(null);
     const [auth, setAuth] = useState(null);
     const [mode, setMode] = useState("dark");
+    const [reactionTypes, setReactionTypes]  = useState(null);
+    const [defaultReactionType, setDefaultReactionType]  = useState(null);
+
+    useEffect(() => {
+        fetchVerify().then(result => {
+            if (result) setAuth(result?.data?.user);
+        });
+    }, []);
 
     const theme = useMemo(() => {
         return createTheme({
@@ -89,6 +101,8 @@ export default function ThemedApp() {
             <AppContext.Provider value={{
                 showDrawer,
                 setShowDrawer,
+                showSearchForm,
+                setSearchShowForm,
                 showForm,
                 setShowForm,
                 globalMsg,
@@ -97,10 +111,14 @@ export default function ThemedApp() {
                 setAuth,
                 mode,
                 setMode,
+                reactionTypes,
+                setReactionTypes,
+                defaultReactionType,
+                setDefaultReactionType,
             }}>
                 <QueryClientProvider client={queryClient}>
-					<RouterProvider router={router} />
-				</QueryClientProvider>
+                    <RouterProvider router={router} />
+                </QueryClientProvider>
                 <CssBaseline />
             </AppContext.Provider>
         </ThemeProvider>

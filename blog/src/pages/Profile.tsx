@@ -1,7 +1,7 @@
 import { Avatar, Box, Typography } from "@mui/material";
 import { pink } from "@mui/material/colors";
 
-import Item from "../components/Item";
+import Item from "../components/Post";
 
 export default function Profile() {
 	return (

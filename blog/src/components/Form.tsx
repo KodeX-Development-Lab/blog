@@ -5,7 +5,7 @@ import {
     Button,
 } from "@mui/material";
 
-export default function Form({ add }: { add: (content: string, name: string) => void }) {
+export default function Form({ add }: { add: (content: string) => void }) {
     const contentRef = useRef<HTMLInputElement>(null);
 
     return (
@@ -13,7 +13,7 @@ export default function Form({ add }: { add: (content: string, name: string) => 
             onSubmit={e => {
                 e.preventDefault();
                 const content = contentRef.current.value;
-                add(content, "Alice");
+                add(content);
                 e.currentTarget.reset();
             }}>
             <Box sx={{ mb: 4, textAlign: "right" }}>

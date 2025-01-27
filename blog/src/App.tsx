@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Item from "./components/Item";
+import Item from "./components/Post";
 import List from "./List";
 import Form from "./components/Form";
 import { useApp } from "./ThemedApp";

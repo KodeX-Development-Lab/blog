@@ -11,16 +11,15 @@ import { useNavigate } from "react-router-dom";
 import { green } from "@mui/material/colors";
 
 import { formatRelative } from "date-fns";
-import { ItemType } from "../types/types";
+import { CommentType } from "../types/types";
 
-interface ItemProps {
-    item: ItemType,
-    remove: (id: number) => void,
-    primary: boolean,
-    comment?: boolean
+interface CommentProps {
+	comment: CommentType,
+	remove: (id: string | number) => void,
+	primary: boolean,
 }
 
-export default function Item({ item, remove, primary, comment } : ItemProps) {
+export default function Comment({ comment, remove, primary }: CommentProps) {
 	const navigate = useNavigate();
 
 	return (
@@ -28,10 +27,6 @@ export default function Item({ item, remove, primary, comment } : ItemProps) {
 			{primary && <Box sx={{ height: 50, bgcolor: green[500] }} />}
 
 			<CardContent
-				onClick={() => {
-					if (comment) return false;
-					navigate(`/comments/${item.id}`);
-				}}
 				sx={{ cursor: "pointer" }}>
 				<Box
 					sx={{
@@ -53,24 +48,27 @@ export default function Item({ item, remove, primary, comment } : ItemProps) {
 						<Typography
 							variant="caption"
 							sx={{ color: green[500] }}>
-							{formatRelative(item.createdAt, new Date())}
+							{formatRelative(comment.createdAt, new Date())}
 						</Typography>
 					</Box>
-					<IconButton
-						sx={{ color: "text.fade" }}
-						size="small"
-						onClick={e => {
-							remove(item.id);
-							e.stopPropagation();
-						}}>
-						<DeleteIcon
-							color="inherit"
-							fontSize="inherit"
-						/>
-					</IconButton>
+					{
+						comment.canDelete &&
+						<IconButton
+							sx={{ color: "text.fade" }}
+							size="small"
+							onClick={e => {
+								remove(comment.id);
+								e.stopPropagation();
+							}}>
+							<DeleteIcon
+								color="inherit"
+								fontSize="inherit"
+							/>
+						</IconButton>
+					}
 				</Box>
 
-				<Typography sx={{ my: 3 }}>{item.content}</Typography>
+				<Typography sx={{ my: 3 }}>{comment.content}</Typography>
 
 				<Box
 					sx={{
@@ -83,7 +81,7 @@ export default function Item({ item, remove, primary, comment } : ItemProps) {
 						fontSize="12"
 						color="info"
 					/>
-					<Typography variant="caption">{item.user.name}</Typography>
+					<Typography variant="caption">{comment.user.name}</Typography>
 				</Box>
 			</CardContent>
 		</Card>
