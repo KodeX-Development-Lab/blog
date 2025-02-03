@@ -12,6 +12,10 @@ import { green } from "@mui/material/colors";
 
 import { formatRelative } from "date-fns";
 import { CommentType } from "../types/types";
+import ReactionButton from "./ReactionButton";
+import { useMutation } from "react-query";
+import { reactComment } from "../libs/fetcher";
+import { queryClient } from "../ThemedApp";
 
 interface CommentProps {
 	comment: CommentType,
@@ -21,6 +25,12 @@ interface CommentProps {
 
 export default function Comment({ comment, remove, primary }: CommentProps) {
 	const navigate = useNavigate();
+
+	const doReaction = useMutation(async (reactionTypeId) => reactComment(comment.postId, comment.id, reactionTypeId), {
+		onSuccess: async () => {
+			queryClient.refetchQueries("comments");
+		},
+	});
 
 	return (
 		<Card sx={{ mb: 2 }}>
@@ -69,6 +79,15 @@ export default function Comment({ comment, remove, primary }: CommentProps) {
 				</Box>
 
 				<Typography sx={{ my: 3 }}>{comment.content}</Typography>
+
+				<ReactionButton
+					type='comment'
+					comment={comment}
+					myReaction={comment.myReaction}
+					reactionBrief={comment.reactionBrief}
+					reactionsCount={comment.reactionsCount}
+					doReaction={doReaction.mutate}
+				/>
 
 				<Box
 					sx={{

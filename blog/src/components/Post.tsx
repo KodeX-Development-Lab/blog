@@ -7,7 +7,7 @@ import {
 	ChatBubbleOutline as CommentIcon
 } from "@mui/icons-material";
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { green, purple } from "@mui/material/colors";
 
@@ -16,7 +16,7 @@ import { PostType } from "../types/types";
 import ReactionButton from "./ReactionButton";
 import { reactPost } from "../libs/fetcher";
 import { useMutation } from "react-query";
-import { useApp } from "../ThemedApp";
+import { queryClient, useApp } from "../ThemedApp";
 
 interface PostProps {
 	post: PostType,
@@ -26,10 +26,11 @@ interface PostProps {
 
 export default function Post({ post, remove, primary }: PostProps) {
 	const navigate = useNavigate();
-	const { setGlobalMsg } = useApp();
 
 	const doReaction = useMutation(async (reactionTypeId) => reactPost(post.id, reactionTypeId), {
 		onSuccess: async () => {
+			queryClient.refetchQueries("posts");
+			queryClient.refetchQueries("userPosts");
 		},
 	});
 
@@ -83,20 +84,25 @@ export default function Post({ post, remove, primary }: PostProps) {
 				</Box>
 
 				<Typography sx={{ my: 3 }}>{post.content}</Typography>
-
 				<Box
+					onClick={(e) => {
+						navigate(`/users/${post.user.id}`)
+						e.stopPropagation();
+					}}
 					sx={{
 						display: "flex",
 						flexDirection: "row",
 						alignItems: "center",
 						gap: 1,
 					}}>
+
 					<UserIcon
 						fontSize="12"
 						color="info"
 					/>
 					<Typography variant="caption">{post.user.name}</Typography>
 				</Box>
+
 				<Box
 					sx={{
 						display: "flex",
@@ -104,6 +110,8 @@ export default function Post({ post, remove, primary }: PostProps) {
 						justifyContent: "space-between",
 					}}>
 					<ReactionButton
+						type='post'
+						post={post}
 						myReaction={post.myReaction}
 						reactionBrief={post.reactionBrief}
 						reactionsCount={post.reactionsCount}
@@ -125,6 +133,6 @@ export default function Post({ post, remove, primary }: PostProps) {
 					</ButtonGroup>
 				</Box>
 			</CardContent>
-		</Card>
+		</Card >
 	);
 }

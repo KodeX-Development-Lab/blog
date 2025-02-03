@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\JwtMiddleware;
 use Illuminate\Support\Facades\Route;
+use Modules\Blog\Http\Controllers\Api\BlogUserController;
 use Modules\Blog\Http\Controllers\Api\CommentController;
 use Modules\Blog\Http\Controllers\Api\CommentReactionController;
 use Modules\Blog\Http\Controllers\Api\PostController;
@@ -26,8 +27,11 @@ Route::middleware(JwtMiddleware::class)->prefix('v1')->group(function () {
     Route::get('all-posts', [PostController::class, 'getAll'])->name('posts.all');
     Route::apiResource('posts', PostController::class)->names('posts');
 
-    Route::get('users/{user_id}/all-posts', [PostController::class, 'getAll'])->name('posts.all');
-    Route::apiResource('users/{user_id}/all-posts', PostController::class)->names('posts');
+    Route::get('users/{user_id}', [BlogUserController::class, 'show'])->name('users.show');
+    Route::post('users/{user_id}/follow', [BlogUserController::class, 'follow'])->name('users.follow');
+
+    Route::get('users/{user_id}/all-posts', [BlogUserController::class, 'getAllPosts'])->name('users.show.posts.all');
+    Route::get('users/{user_id}/posts', [BlogUserController::class, 'getPostByParams'])->name('users.show.posts.index');
 
     Route::get('posts/{post_id}/brief-reactions', [PostReactionController::class, 'getGroupByCount'])->name('post.show.reactions.brief');
     Route::get('posts/{post_id}/all-reactions', [PostReactionController::class, 'getAll'])->name('post.show.reactions.all');

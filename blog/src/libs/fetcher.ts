@@ -39,6 +39,23 @@ export async function fetchPosts({ search }: { search: string }) {
 	throw new Error("Error: Check Network Log");
 }
 
+export async function fetchUserPosts({ userId, search }: { userId: string | number, search: string }) {
+	const token = getToken();
+
+	const res = await fetch(`${api}/users/${userId}/all-posts?search=${search}`, {
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (res.ok) {
+		return await res.json();
+	}
+
+	throw new Error("Error: Check Network Log");
+}
+
 export async function fetchPost(id: string) {
 	const token = getToken();
 
@@ -52,6 +69,40 @@ export async function fetchPost(id: string) {
 	if (res.ok) {
 		const result = await res.json();
 		return result?.data?.post;
+	}
+
+	throw new Error("Error: Check Network Log");
+}
+
+export async function fetchPostBriefReactions(id: string | number) {
+	const token = getToken();
+
+	const res = await fetch(`${api}/posts/${id}/brief-reactions`, {
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (res.ok) {
+		return res.json();
+	}
+
+	throw new Error("Error: Check Network Log");
+}
+
+export async function fetchPostReactions(id: string | number, reactionTypeId?: string | number) {
+	const token = getToken();
+
+	const res = await fetch(`${api}/posts/${id}/all-reactions?reaction_type=${reactionTypeId}`, {
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (res.ok) {
+		return res.json();
 	}
 
 	throw new Error("Error: Check Network Log");
@@ -75,7 +126,7 @@ export async function reactPost(postId: string, reactionTypeId: string) {
 	throw new Error("Error: Check Network Log");
 }
 
-export async function reactComment(postId: string, commentId: string, reactionTypeId: string) {
+export async function reactComment(postId: string | number, commentId: string, reactionTypeId: string) {
 	const token = getToken();
 	const res = await fetch(`${api}/posts/${postId}/comments/${commentId}/reactions`, {
 		method: "POST",
@@ -106,6 +157,40 @@ export async function fetchPostComments(postId: string) {
 	if (res.ok) {
 		const result = await res.json();
 		return result?.data?.comments;
+	}
+
+	throw new Error("Error: Check Network Log");
+}
+
+export async function fetchCommentBriefReactions(postId: string | number, commentId: string | number) {
+	const token = getToken();
+
+	const res = await fetch(`${api}/posts/${postId}/comments/${commentId}/brief-reactions`, {
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (res.ok) {
+		return res.json();
+	}
+
+	throw new Error("Error: Check Network Log");
+}
+
+export async function fetchCommentReactions(postId: string | number, commentId: string | number, reactionTypeId?: string | number) {
+	const token = getToken();
+
+	const res = await fetch(`${api}/posts/${postId}/comments/${commentId}/all-reactions?reaction_type=${reactionTypeId}`, {
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (res.ok) {
+		return res.json();
 	}
 
 	throw new Error("Error: Check Network Log");
@@ -204,7 +289,11 @@ export async function fetchUser(id: string) {
 		},
 	});
 
-	return res.json();
+	if (res.ok) {
+		return res.json();
+	}
+
+	return false;
 }
 
 export async function deletePost(postId: string) {
@@ -233,4 +322,16 @@ export async function deleteComment(postId: string, commentId: string) {
 	}
 
 	throw new Error("Error: Check Network Log");
+}
+
+export async function postFollow(id: number | string) {
+	const token = getToken();
+	const res = await fetch(`${api}/users/${id}/follow`, {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	return res.json();
 }

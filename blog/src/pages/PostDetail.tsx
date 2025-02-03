@@ -13,17 +13,43 @@ import { green } from "@mui/material/colors";
 import { formatRelative } from "date-fns";
 import { PostType } from "../types/types";
 import { useMutation, useQuery } from "react-query";
-import { fetchPost } from "../libs/fetcher";
+import { fetchPost, fetchReactionTypes } from "../libs/fetcher";
 import Post from "../components/Post";
 import { queryClient, useApp } from "../ThemedApp";
 import Comments from "../components/Comments";
+import { useEffect } from "react";
 
 export default function PostDetail() {
-	const { setGlobalMsg } = useApp();
+	const { setGlobalMsg, setReactionTypes, setDefaultReactionType } = useApp();
 	const navigate = useNavigate();
 	const { id } = useParams();
 
 	const { isLoading, isError, error, data } = useQuery(["post", id], () => fetchPost(id));
+	const { data: reactionTypesResult } = useQuery("reactionTypes", () => fetchReactionTypes({ search: "" }));
+
+
+	useEffect(() => {
+		if (reactionTypesResult?.data?.reactionTypes && reactionTypesResult?.data?.reactionTypes.length > 0) {
+			const reactionTypes = reactionTypesResult?.data?.reactionTypes;
+			setReactionTypes(reactionTypes);
+
+			const reactionTypesCount = reactionTypes.length;
+
+			for (let i = 0; i < reactionTypesCount; i++) {
+				const element = reactionTypes[i];
+
+				if (element.is_default) {
+					setDefaultReactionType(reactionTypes[i]);
+					break;
+				}
+			}
+
+			// if (defaultReactionType == null) {
+			//   console.log("no")
+			//   setDefaultReactionType(reactionTypes[0]);
+			// }
+		}
+	}, [reactionTypesResult]);
 
 	const remove = useMutation(async id => deletePost(id), {
 		onMutate: async id => {
@@ -56,7 +82,7 @@ export default function PostDetail() {
 				remove={remove.mutate}
 			/>
 			<h5>Comments</h5>
-			<Comments/>
+			<Comments />
 		</>
 	);
 }

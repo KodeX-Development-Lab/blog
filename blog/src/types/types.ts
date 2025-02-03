@@ -18,6 +18,7 @@ interface Post {
 interface Comment {
     id: string,
     name: string,
+    postId: string | number,
     content: string,
     myReaction?: object | null,
     reactionBrief: [],
@@ -31,4 +32,4 @@ interface Comment {
     }
 }
 
-export type {Post as PostType, Comment as CommentType}
+export type { Post as PostType, Comment as CommentType }

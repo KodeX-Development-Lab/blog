@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Item from "../components/Post";
 import Form from "../components/Form";
 import { queryClient, useApp } from "../ThemedApp";
-import { Alert, Box } from "@mui/material";
+import { Alert, Box, Button, Typography } from "@mui/material";
 import { useMutation, useQuery } from "react-query";
 import { deletePost, fetchPosts, fetchReactionTypes, postPost } from "../libs/fetcher";
 import SearchForm from "../components/SearchForm";
@@ -10,6 +10,8 @@ import Post from "../components/Post";
 
 
 export default function Home() {
+  const [showLatest, setShowLatest] = useState(true);
+
   const { showForm, showSearchForm, setGlobalMsg, setReactionTypes, defaultReactionType, setDefaultReactionType } = useApp();
   const { isLoading, isError, error, data } = useQuery("posts", () => fetchPosts({ search: "" }));
   const { data: reactionTypesResult } = useQuery("reactionTypes", () => fetchReactionTypes({ search: "" }));
@@ -19,22 +21,6 @@ export default function Home() {
     if (reactionTypesResult?.data?.reactionTypes && reactionTypesResult?.data?.reactionTypes.length > 0) {
       const reactionTypes = reactionTypesResult?.data?.reactionTypes;
       setReactionTypes(reactionTypes);
-
-      const reactionTypesCount = reactionTypes.length;
-
-      for (let i = 0; i < reactionTypesCount; i++) {
-        const element = reactionTypes[i];
-
-        if (element.is_default) {
-          setDefaultReactionType(reactionTypes[i]);
-          break;
-        }
-      }
-
-      // if (defaultReactionType == null) {
-      //   console.log("no")
-      //   setDefaultReactionType(reactionTypes[0]);
-      // }
     }
   }, [reactionTypesResult]);
 
@@ -73,6 +59,28 @@ export default function Home() {
     <Box>
       {showForm && <Form add={add.mutate} />}
       {showSearchForm && <SearchForm add={add.mutate} />}
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          mb: 1,
+        }}>
+        <Button
+          disabled={showLatest}
+          onClick={() => setShowLatest(true)}>
+          Latest
+        </Button>
+        <Typography sx={{ color: "text.fade", fontSize: 15 }}>
+          |
+        </Typography>
+        <Button
+          disabled={!showLatest}
+          onClick={() => setShowLatest(false)}>
+          Following
+        </Button>
+      </Box>
 
       {
         data.length == 0 && <p>No Post</p>

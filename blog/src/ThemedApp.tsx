@@ -19,6 +19,8 @@ import Comments from "./pages/Comments";
 
 import { fetchVerify } from "./libs/fetcher";
 import PostDetail from "./pages/PostDetail";
+import PostReactions from "./pages/PostReactions";
+import CommentReactions from "./pages/CommentReactions";
 
 // import App from "./App";
 // import AppDrawer from "./components/AppDrawer";
@@ -53,12 +55,16 @@ const router = createBrowserRouter([
                 element: <PostDetail />,
             },
             {
-                path: "/profile/:id",
-                element: <Profile />,
+                path: "/posts/:id/reactions",
+                element: <PostReactions />,
             },
             {
-                path: "/likes/:id",
-                element: <Likes />,
+                path: "/posts/:id/comments/:commentId/reactions",
+                element: <CommentReactions />,
+            },
+            {
+                path: "/users/:id",
+                element: <Profile />,
             },
         ],
     },
