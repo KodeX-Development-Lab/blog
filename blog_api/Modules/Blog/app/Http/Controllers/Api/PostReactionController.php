@@ -5,15 +5,19 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Blog\Http\Requests\PostReactionRequest;
 use Modules\Blog\Services\PostReactionService;
+use Modules\Blog\Services\PostService;
+use Modules\Blog\Transformers\PostResource;
 use Modules\Blog\Transformers\ReactionResource;
 
 class PostReactionController extends Controller
 {
     private $postReactionService;
+    private $postService;
 
-    public function __construct(PostReactionService $postReactionService)
+    public function __construct(PostReactionService $postReactionService, PostService $postService)
     {
         $this->postReactionService = $postReactionService;
+        $this->postService = $postService;
     }
 
     public function getGroupByCount(Request $request, $post_id)
@@ -74,7 +78,9 @@ class PostReactionController extends Controller
 
         $this->postReactionService->makeReaction($request->toArray());
 
-        return $this->responseFromAPI("success", 200, [], null);
+        return $this->responseFromAPI("success", 200, [
+            'post' => new PostResource($this->postService->findById($post_id))
+        ], null);
     }
 
 }

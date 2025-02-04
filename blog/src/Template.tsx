@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
 import AppDrawer from "./components/AppDrawer";
 import { useApp } from "./ThemedApp";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 export default function Template() {
     const { globalMsg, setGlobalMsg } = useApp();
@@ -12,7 +13,7 @@ export default function Template() {
             <Header />
             <AppDrawer />
             <Container maxWidth="sm" sx={{ mt: 4 }}>
-                <Outlet />
+                <ProtectedRoutes />
             </Container>
             <Snackbar
                 anchorOrigin={{

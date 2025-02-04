@@ -28,9 +28,29 @@ export default function Post({ post, remove, primary }: PostProps) {
 	const navigate = useNavigate();
 
 	const doReaction = useMutation(async (reactionTypeId) => reactPost(post.id, reactionTypeId), {
-		onSuccess: async () => {
-			queryClient.refetchQueries("posts");
-			queryClient.refetchQueries("userPosts");
+		onSuccess: async (result) => {
+			const post = result.data?.post;
+			await queryClient.cancelQueries("posts");
+			await queryClient.cancelQueries("userPosts");
+
+			await queryClient.setQueryData(["posts", true], old => {
+				return old.map(item => {
+					if(item.id == post.id) {
+						return post;
+					}
+
+					return item;
+				})
+			});
+			await queryClient.setQueryData("userPosts", old => {
+				return old.map(item => {
+					if(item.id == post.id) {
+						return post;
+					}
+
+					return item;
+				})
+			});
 		},
 	});
 

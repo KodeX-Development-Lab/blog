@@ -13,7 +13,7 @@ export default function Home() {
   const [showLatest, setShowLatest] = useState(true);
 
   const { showForm, showSearchForm, setGlobalMsg, setReactionTypes, defaultReactionType, setDefaultReactionType } = useApp();
-  const { isLoading, isError, error, data } = useQuery("posts", () => fetchPosts({ search: "" }));
+  const { isLoading, isError, error, data } = useQuery(["posts", showLatest], () => fetchPosts({ search: "", only_following_posts: !showLatest }));
   const { data: reactionTypesResult } = useQuery("reactionTypes", () => fetchReactionTypes({ search: "" }));
 
 
@@ -70,7 +70,7 @@ export default function Home() {
         <Button
           disabled={showLatest}
           onClick={() => setShowLatest(true)}>
-          Latest
+          All
         </Button>
         <Typography sx={{ color: "text.fade", fontSize: 15 }}>
           |

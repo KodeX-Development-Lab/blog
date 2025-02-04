@@ -6,15 +6,19 @@ use Illuminate\Http\Request;
 use Modules\Blog\Http\Requests\CommentReactionRequest;
 use Modules\Blog\Models\ReactionType;
 use Modules\Blog\Services\CommentReactionService;
+use Modules\Blog\Services\CommentService;
+use Modules\Blog\Transformers\CommentResource;
 use Modules\Blog\Transformers\ReactionResource;
 
 class CommentReactionController extends Controller
 {
     private $commentReactionService;
+    private $commentService;
 
-    public function __construct(CommentReactionService $commentReactionService)
+    public function __construct(CommentReactionService $commentReactionService, CommentService $commentService)
     {
         $this->commentReactionService = $commentReactionService;
+        $this->commentService = $commentService;
     }
 
     public function getGroupByCount(Request $request, $post_id, $comment_id)
@@ -67,7 +71,9 @@ class CommentReactionController extends Controller
 
         $this->commentReactionService->makeReaction($request->toArray());
 
-        return $this->responseFromAPI("success", 200, [], null);
+        return $this->responseFromAPI("success", 200, [
+            'comment' => new CommentResource($this->commentService->findById($comment_id))
+        ], null);
     }
 
 }

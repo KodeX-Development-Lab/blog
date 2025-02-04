@@ -21,6 +21,12 @@ use Modules\Blog\Http\Controllers\Api\ReactionTypeController;
 */
 
 Route::middleware(JwtMiddleware::class)->prefix('v1')->group(function () {
+    Route::prefix('/blog-app')->group(function () {
+        Route::get('profile', [BlogUserController::class, 'getMyProfileData'])->name('myprofile.index');
+        Route::get('profile/all-my-posts', [BlogUserController::class, 'getAllMyPosts'])->name('myprofile.posts.all');
+        Route::get('profile/my-posts', [BlogUserController::class, 'getMyPostsByParams'])->name('myprofile.posts.index');
+    });
+
     Route::get('all-reaction-types', [ReactionTypeController::class, 'getAll'])->name('posts.all');
     Route::get('reaction-types', [ReactionTypeController::class, 'index'])->name('posts.index');
 

@@ -21,10 +21,10 @@ export async function fetchReactionTypes({ search }: { search: string }) {
 	throw new Error("Error: Check Network Log");
 }
 
-export async function fetchPosts({ search }: { search: string }) {
+export async function fetchPosts({ search, only_following_posts }: { search: string, only_following_posts: boolean }) {
 	const token = getToken();
 
-	const res = await fetch(`${api}/all-posts?search=${search}`, {
+	const res = await fetch(`${api}/all-posts?only_following_posts=${only_following_posts ? 1 : 0}&search=${search}`, {
 		headers: {
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${token}`,

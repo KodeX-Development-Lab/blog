@@ -35,16 +35,16 @@ export function useApp() {
 
 const router = createBrowserRouter([
     {
+        path: "/login",
+        element: <Login />,
+    },
+    {
         path: "/",
         element: <Template />,
         children: [
             {
                 path: "/",
                 element: <Home />,
-            },
-            {
-                path: "/login",
-                element: <Login />,
             },
             {
                 path: "/register",
@@ -85,6 +85,7 @@ export default function ThemedApp() {
     useEffect(() => {
         fetchVerify().then(result => {
             if (result) setAuth(result?.data?.user);
+            // else location.replace('/login')
         });
     }, []);
 
