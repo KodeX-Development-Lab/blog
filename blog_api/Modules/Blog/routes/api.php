@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\JwtMiddleware;
 use Illuminate\Support\Facades\Route;
+use Modules\Blog\Http\Controllers\Api\BlogNotificationController;
 use Modules\Blog\Http\Controllers\Api\BlogUserController;
 use Modules\Blog\Http\Controllers\Api\CommentController;
 use Modules\Blog\Http\Controllers\Api\CommentReactionController;
@@ -21,11 +22,6 @@ use Modules\Blog\Http\Controllers\Api\ReactionTypeController;
 */
 
 Route::middleware(JwtMiddleware::class)->prefix('v1')->group(function () {
-    Route::prefix('/blog-app')->group(function () {
-        Route::get('profile', [BlogUserController::class, 'getMyProfileData'])->name('myprofile.index');
-        Route::get('profile/all-my-posts', [BlogUserController::class, 'getAllMyPosts'])->name('myprofile.posts.all');
-        Route::get('profile/my-posts', [BlogUserController::class, 'getMyPostsByParams'])->name('myprofile.posts.index');
-    });
 
     Route::get('all-reaction-types', [ReactionTypeController::class, 'getAll'])->name('posts.all');
     Route::get('reaction-types', [ReactionTypeController::class, 'index'])->name('posts.index');
@@ -51,4 +47,15 @@ Route::middleware(JwtMiddleware::class)->prefix('v1')->group(function () {
     Route::get('posts/{post_id}/comments/{comment_id}/all-reactions', [CommentReactionController::class, 'getAll'])->name('comments.show.reactions.all');
     Route::get('posts/{post_id}/comments/{comment_id}/reactions', [CommentReactionController::class, 'index'])->name('comments.show.reactions.index');
     Route::post('posts/{post_id}/comments/{comment_id}/reactions', [CommentReactionController::class, 'makeReaction'])->name('comments.show.reactions.store');
+
+    Route::prefix('/blog-app')->group(function () {
+        Route::get('profile', [BlogUserController::class, 'getMyProfileData'])->name('myprofile.index');
+        Route::get('profile/all-my-posts', [BlogUserController::class, 'getAllMyPosts'])->name('myprofile.posts.all');
+        Route::get('profile/my-posts', [BlogUserController::class, 'getMyPostsByParams'])->name('myprofile.posts.index');
+
+        Route::get('all-notifications', [BlogNotificationController::class, 'getAll'])->name('notifications.all');
+        Route::apiResource('notifications', BlogNotificationController::class)->names('notifications');
+        Route::patch('notifications/{notification_id}/read', [BlogNotificationController::class, 'read'])->name('notifications.read');
+        Route::patch('mark-as-read-notifications', [BlogNotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    });
 });

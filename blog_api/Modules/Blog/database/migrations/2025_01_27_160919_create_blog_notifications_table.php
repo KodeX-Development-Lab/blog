@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
+        Schema::create('blog_notifications', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('type');
             $table->string('content');
             $table->foreignUuid('post_id')->constrained();
+            $table->foreignUuid('comment_id')->nullable();
             $table->foreignUuid('user_id')->constrained();
             $table->boolean('is_read')->default(false);
             $table->timestamp('read_at')->nullable();

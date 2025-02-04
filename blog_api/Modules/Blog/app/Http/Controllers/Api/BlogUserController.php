@@ -102,8 +102,10 @@ class BlogUserController extends Controller
 
     public function follow(FollowRequest $request, $user_id)
     {
+        $user = Auth::user();
+
         $request->merge([
-            'follower_id'  => auth()->user()->id,
+            'follower_id'  => $user->id,
             'following_id' => $user_id,
         ]);
 

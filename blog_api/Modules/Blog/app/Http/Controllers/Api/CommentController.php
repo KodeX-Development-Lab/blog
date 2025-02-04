@@ -3,19 +3,23 @@ namespace Modules\Blog\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Modules\Blog\Http\Requests\CommentRequest;
-use Modules\Blog\Models\Comment;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Services\BlogNotificationService;
 use Modules\Blog\Services\CommentService;
 use Modules\Blog\Transformers\CommentResource;
 
 class CommentController extends Controller
 {
-    private $commentService;
+    private CommentService $commentService;
+    private BlogNotificationService $blogNotificationService;
 
-    public function __construct(CommentService $commentService)
+    public function __construct(CommentService $commentService, BlogNotificationService $blogNotificationService)
     {
-        $this->commentService = $commentService;
+        $this->commentService          = $commentService;
+        $this->blogNotificationService = $blogNotificationService;
     }
 
     /**
@@ -48,12 +52,26 @@ class CommentController extends Controller
      */
     public function store(CommentRequest $request, $post_id)
     {
+        $user = Auth::user();
+
         $request->merge([
-            'user_id' => auth()->user()->id,
+            'user_id' => $user->id,
             'post_id' => $post_id,
         ]);
 
+        DB::beginTransaction();
         $comment = $this->commentService->create($request->toArray());
+
+        $post = Post::findOrFail($post_id);
+        $this->blogNotificationService->save([
+            "type"       => "comment",
+            "content"    => "$user->name commented on a post",
+            "post_id"    => $post_id,
+            "comment_id" => $comment->id,
+            "user_id"    => $post->user_id,
+        ]);
+
+        DB::commit();
         $comment = $this->commentService->findById($comment->id);
 
         return $this->responseFromAPI("success", 201, ['comment' => new CommentResource($comment)], "Successfully saved", null);
