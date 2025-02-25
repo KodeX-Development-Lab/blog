@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Modules\Blog\Events\NewBlogNotificationEvent;
 use Modules\Blog\Http\Requests\CommentRequest;
 use Modules\Blog\Models\Post;
 use Modules\Blog\Services\BlogNotificationService;
@@ -70,6 +71,8 @@ class CommentController extends Controller
             "comment_id" => $comment->id,
             "user_id"    => $post->user_id,
         ]);
+
+        NewBlogNotificationEvent::dispatch('blog-notification', "$user->name commented on a post");
 
         DB::commit();
         $comment = $this->commentService->findById($comment->id);

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
+    Box,
     CssBaseline,
     Snackbar,
     ThemeProvider,
@@ -7,7 +8,7 @@ import {
 } from "@mui/material";
 import { deepPurple, grey } from "@mui/material/colors";
 import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
-import { QueryClientProvider, QueryClient } from "react-query";
+import { QueryClientProvider, QueryClient, useQuery } from "react-query";
 
 import Template from "./Template";
 import Home from "./pages/Home";
@@ -79,14 +80,18 @@ export default function ThemedApp() {
     const [globalMsg, setGlobalMsg] = useState(null);
     const [auth, setAuth] = useState(null);
     const [mode, setMode] = useState("dark");
-    const [reactionTypes, setReactionTypes]  = useState(null);
-    const [defaultReactionType, setDefaultReactionType]  = useState(null);
+    const [reactionTypes, setReactionTypes] = useState(null);
+    const [defaultReactionType, setDefaultReactionType] = useState(null);
 
     useEffect(() => {
-        fetchVerify().then(result => {
-            if (result) setAuth(result?.data?.user);
-            // else location.replace('/login')
-        });
+        fetchVerify()
+            .then(result => {
+                if (result) setAuth(result?.data?.user);
+                // else location.replace('/login')
+            })
+            .catch(() => {
+                location.replace('/login')
+            });
     }, []);
 
     const theme = useMemo(() => {

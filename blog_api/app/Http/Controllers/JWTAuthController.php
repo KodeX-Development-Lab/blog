@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -31,9 +32,7 @@ class JWTAuthController extends Controller
             'password' => Hash::make($request->get('password')),
         ]);
 
-        $token = JWTAuth::fromUser($user);
-
-        return response()->json(compact('user','token'), 201);
+        return $this->responseFromAPI("success", 200, [], "Registration Success", null);
     }
 
     // User login
@@ -52,7 +51,7 @@ class JWTAuthController extends Controller
             // (optional) Attach the role to the token.
             $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
 
-            return $this->responseFromAPI("success", 200, ['user' => $user, 'token' => $token], null);
+            return $this->responseFromAPI("success", 200, ['user' => new UserResource($user), 'token' => $token], "Login Success", null);
         } catch (JWTException $e) {
             return response()->json(['error' => 'Could not create token'], 500);
         }
